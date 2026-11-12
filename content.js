@@ -77,7 +77,7 @@ window.SITE = {
       category: "headshots",
       date: "Fall 2026",
       folder: "photos/portraits",
-      cover: "15.jpg",
+      cover: ".jpg",
       photos: 17
     },
     {
