@@ -26,7 +26,7 @@ window.SITE = {
   /* ---------- Contact ---------- */
   contact: {
     email: "annawu1@wharton.upenn.edu",          // inquiries from the booking form go here
-    instagram: "awu.photography"            // your handle, without the @
+    instagram: "Wuflixs_"            // your handle, without the @
   },
 
   /* ---------- Booking link (optional) ----------
