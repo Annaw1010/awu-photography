@@ -190,9 +190,10 @@
   types.push("Something else");
   $("f-type").innerHTML = types.map(function (t) { return "<option>" + esc(t) + "</option>"; }).join("");
 
-  $("inquiry").addEventListener("submit", function (e) {
+    $("inquiry").addEventListener("submit", function (e) {
     e.preventDefault();
     var f = e.target, status = $("form-status");
+    var btn = f.querySelector('button[type="submit"]');
     var nameEl = f.elements.name, emailEl = f.elements.email;
     var okName = nameEl.value.trim() !== "";
     var okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
@@ -203,19 +204,37 @@
       (!okName ? nameEl : emailEl).focus();
       return;
     }
-    if (!c.email) { status.textContent = "Email isn't set up yet. Message me on Instagram instead."; return; }
-    var date = f.elements.date.value;
-    var subject = "Booking inquiry: " + f.elements.type.value;
-    var body = [
-      "Name: " + nameEl.value.trim(),
-      "Email: " + emailEl.value.trim(),
-      "Session: " + f.elements.type.value,
-      "Preferred date: " + (date || "Flexible"),
-      "",
-      f.elements.message.value.trim()
-    ].join("\n");
-    window.location.href = "mailto:" + c.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-    status.textContent = "Your email app should open with the message filled in. Press send there to finish.";
+    var data = {
+      Name: nameEl.value.trim(),
+      Email: emailEl.value.trim(),
+      Session: f.elements.type.value,
+      "Preferred date": f.elements.date.value || "Flexible",
+      Details: f.elements.message.value.trim() || "(none)",
+      _subject: "Booking inquiry: " + f.elements.type.value,
+      _replyto: emailEl.value.trim(),
+      _template: "table"
+    };
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+    status.textContent = "";
+    fetch("https://formsubmit.co/ajax/" + c.email, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(data)
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (String(res.success) !== "true") throw new Error(res.message || "Not sent");
+        status.textContent = "Thanks! Your inquiry was sent. I'll reply by email soon.";
+        f.reset();
+      })
+      .catch(function () {
+        status.innerHTML = "That didn't send. Email me directly at <a href=\"mailto:" + esc(c.email) + "\">" + esc(c.email) + "</a>.";
+      })
+      .then(function () {
+        btn.disabled = false;
+        btn.textContent = "Send inquiry";
+      });
   });
 
   /* ---------- Album page ---------- */
