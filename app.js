@@ -227,7 +227,7 @@
     currentPhotos = photos;
     var cat = catById[a.category];
     document.title = a.title + " | " + name;
-    $("cover-img").src = url(coverOf(a));
+    $("cover-img").src = url(a.banner ? join(a, a.banner) : coverOf(a));
     $("cover-img").alt = a.title;
     $("album-title").textContent = a.title;
     $("album-meta").textContent = [cat ? cat.name : "", a.date].filter(Boolean).join(", ");
