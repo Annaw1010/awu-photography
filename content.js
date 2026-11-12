@@ -88,7 +88,7 @@ window.SITE = {
       date: "Fall 2026",
       folder: "photos/groups",
       cover: "7.jpg",
-      photos: 7
+      photos: 6
     },
     {
       id: "events",
