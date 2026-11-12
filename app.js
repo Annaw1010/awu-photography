@@ -68,7 +68,7 @@
   $("copyright").textContent = "\u00A9 " + new Date().getFullYear() + " " + name;
 
   var c = S.contact || {};
-  if (c.instagram) $("foot-ig").href = "https://instagram.com/" + c.instagram.replace(/^@/, "");
+  if (c.instagram) $("foot-ig").href = "https://instagram.com/wuflixs_";
   else $("foot-ig").remove();
   if (c.email) $("foot-email").href = "mailto:" + c.email;
   else $("foot-email").remove();
