@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Awu Photography</title>
+  <meta name="description" content="Portfolio and booking for Awu Photography: headshots, group photos and events.">
+  <meta property="og:title" content="Awu Photography">
+  <meta property="og:description" content="Portfolio and booking: headshots, group photos and events.">
+  <meta property="og:image" content="photos/site/hero.jpg">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="bar" id="bar">
+    <a class="brand" href="#" data-home>Awu Photography</a>
+    <nav class="bar-links" aria-label="Main">
+      <a href="#portfolio" data-home>Portfolio</a>
+      <a href="#about" data-home>About</a>
+      <a class="btn btn-small" href="#book" data-book>Book</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HOME VIEW -->
+    <div id="home">
+      <section class="hero" aria-label="Introduction">
+        <img class="hero-img" id="hero-img" alt="">
+        <div class="hero-shade"></div>
+        <div class="hero-text">
+          <h1 class="wordmark"><span>Awu</span><span>Photography</span></h1>
+          <p class="tagline" id="tagline"></p>
+          <div class="hero-actions">
+            <a class="btn btn-light" href="#portfolio" data-home>View portfolio</a>
+            <a class="btn btn-ghost" href="#book" data-book>Book a session</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="portfolio" aria-labelledby="portfolio-h">
+        <div class="section-head">
+          <h2 id="portfolio-h">Portfolio</h2>
+          <div class="tabs" id="tabs" role="tablist" aria-label="Photo categories"></div>
+        </div>
+        <div class="albums" id="albums"></div>
+      </section>
+
+      <section class="section about" id="about" aria-labelledby="about-h">
+        <div class="about-photo" id="about-photo"></div>
+        <div class="about-text">
+          <h2 id="about-h">About</h2>
+          <div id="about-copy"></div>
+        </div>
+      </section>
+
+      <section class="section book" id="book" aria-labelledby="book-h">
+        <h2 id="book-h">Book a session</h2>
+        <ul class="packages" id="packages"></ul>
+        <div class="book-link" id="book-link" hidden>
+          <a class="btn" id="book-link-btn" target="_blank" rel="noopener">Open booking form</a>
+          <p class="muted">Prefer email? Use the form below.</p>
+        </div>
+        <form class="inquiry" id="inquiry" novalidate>
+          <div class="field">
+            <label for="f-name">Your name</label>
+            <input id="f-name" name="name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="f-email">Your email</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="f-type">Session type</label>
+            <select id="f-type" name="type"></select>
+          </div>
+          <div class="field">
+            <label for="f-date">Preferred date</label>
+            <input id="f-date" name="date" type="date">
+          </div>
+          <div class="field field-wide">
+            <label for="f-msg">Details</label>
+            <textarea id="f-msg" name="message" rows="4" placeholder="How many people, where, and anything else I should know."></textarea>
+          </div>
+          <div class="form-foot field-wide">
+            <button class="btn" type="submit">Send inquiry</button>
+            <p class="muted" id="form-status" role="status"></p>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- ALBUM VIEW -->
+    <div id="album" hidden>
+      <section class="cover" aria-label="Album cover">
+        <img class="cover-img" id="cover-img" alt="">
+        <div class="hero-shade"></div>
+        <div class="cover-text">
+          <h1 id="album-title"></h1>
+          <p id="album-meta"></p>
+          <a class="btn btn-light" href="#gallery">View gallery</a>
+        </div>
+      </section>
+      <div class="album-bar" id="gallery">
+        <a href="#portfolio" data-home class="back">All albums</a>
+        <span class="muted" id="album-count"></span>
+      </div>
+      <div class="masonry" id="masonry"></div>
+      <div class="album-cta">
+        <p>Want photos like these?</p>
+        <a class="btn" href="#book" data-book>Book a session</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span id="copyright"></span>
+    <span class="foot-links">
+      <a id="foot-ig" target="_blank" rel="noopener">Instagram</a>
+      <a id="foot-email">Email</a>
+    </span>
+  </footer>
+
+  <!-- PHOTO VIEWER -->
+  <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lb-btn lb-close" id="lb-close" aria-label="Close">&#x2715;</button>
+    <button class="lb-btn lb-prev" id="lb-prev" aria-label="Previous photo">&#x2039;</button>
+    <img class="lb-img" id="lb-img" alt="">
+    <button class="lb-btn lb-next" id="lb-next" aria-label="Next photo">&#x203A;</button>
+    <p class="lb-count" id="lb-count"></p>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
