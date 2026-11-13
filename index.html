@@ -78,13 +78,22 @@
             <label for="f-type">Session type</label>
             <select id="f-type" name="type"></select>
           </div>
+          <div class="field field-wide">
+            <label for="f-type">Session type</label>
+            <select id="f-type" name="type"></select>
+          </div>
+          <p class="muted field-wide" style="margin:0">Available Tuesdays and Thursdays 1 to 5 PM, and Fridays through Sundays 9 AM to 5 PM.</p>
           <div class="field">
             <label for="f-date">Preferred date</label>
-            <input id="f-date" name="date" type="date">
+            <input id="f-date" name="date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="f-time">Preferred time</label>
+            <select id="f-time" name="time" disabled><option value="">Pick a date first</option></select>
           </div>
           <div class="field field-wide">
-            <label for="f-msg">Details</label>
-            <textarea id="f-msg" name="message" rows="4" placeholder="How many people, where, and anything else I should know."></textarea>
+            <label for="f-msg">Backup times and location</label>
+            <textarea id="f-msg" name="message" rows="4" required placeholder="List 2 or 3 other dates and times that work for you, and where you'd like to shoot (for example Locust Walk or Huntsman). For groups, add how many people."></textarea>
           </div>
           <div class="form-foot field-wide">
             <button class="btn" type="submit">Send inquiry</button>
