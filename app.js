@@ -190,40 +190,88 @@
   types.push("Something else");
   $("f-type").innerHTML = types.map(function (t) { return "<option>" + esc(t) + "</option>"; }).join("");
 
-    $("inquiry").addEventListener("submit", function (e) {
+  /* Availability: day of week (0 = Sunday) -> [first hour, closing hour] */
+  var HOURS = { 0: [9, 17], 2: [13, 17], 4: [13, 17], 5: [9, 17], 6: [9, 17] };
+  var SLOT_MINUTES = 30;
+  var dateEl = $("f-date"), timeEl = $("f-time");
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function fmtTime(h, m) { return (h % 12 || 12) + ":" + pad(m) + " " + (h < 12 ? "AM" : "PM"); }
+  var today = new Date();
+  dateEl.min = today.getFullYear() + "-" + pad(today.getMonth() + 1) + "-" + pad(today.getDate());
+
+  function fillTimes() {
+    var d = dateEl.value;
+    if (!d) {
+      timeEl.disabled = true;
+      timeEl.innerHTML = '<option value="">Pick a date first</option>';
+      return true;
+    }
+    var range = HOURS[new Date(d + "T00:00:00").getDay()];
+    if (!range) {
+      timeEl.disabled = true;
+      timeEl.innerHTML = '<option value="">Not available that day</option>';
+      return false;
+    }
+    var opts = "";
+    for (var mins = range[0] * 60; mins < range[1] * 60; mins += SLOT_MINUTES) {
+      var h = Math.floor(mins / 60), m = mins % 60;
+      opts += '<option value="' + pad(h) + ":" + pad(m) + '">' + fmtTime(h, m) + "</option>";
+    }
+    timeEl.innerHTML = opts;
+    timeEl.disabled = false;
+    return true;
+  }
+  dateEl.addEventListener("change", function () {
+    var ok = fillTimes();
+    dateEl.setAttribute("aria-invalid", !ok);
+    $("form-status").textContent = ok ? "" : "I'm available Tuesdays and Thursdays after 1 PM, and Fridays through Sundays. Please pick one of those days.";
+  });
+
+  $("inquiry").addEventListener("submit", function (e) {
     e.preventDefault();
     var f = e.target, status = $("form-status");
     var btn = f.querySelector('button[type="submit"]');
-    var nameEl = f.elements.name, emailEl = f.elements.email;
-    var okName = nameEl.value.trim() !== "";
-    var okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
-    nameEl.setAttribute("aria-invalid", !okName);
-    emailEl.setAttribute("aria-invalid", !okEmail);
-    if (!okName || !okEmail) {
-      status.textContent = !okName ? "Add your name so I know who's asking." : "Add a valid email so I can reply.";
-      (!okName ? nameEl : emailEl).focus();
-      return;
+    var nameEl = f.elements.name, emailEl = f.elements.email, msgEl = f.elements.message;
+    var checks = [
+      [nameEl, nameEl.value.trim() !== "", "Add your name so I know who's asking."],
+      [emailEl, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim()), "Add a valid email so I can reply."],
+      [dateEl, dateEl.value !== "" && fillTimes(), "Pick a Tuesday, Thursday, Friday, Saturday or Sunday."],
+      [msgEl, msgEl.value.trim() !== "", "Add a few backup times and where you'd like to shoot."]
+    ];
+    for (var i = 0; i < checks.length; i++) {
+      checks[i][0].setAttribute("aria-invalid", !checks[i][1]);
     }
+    for (var j = 0; j < checks.length; j++) {
+      if (!checks[j][1]) { status.textContent = checks[j][2]; checks[j][0].focus(); return; }
+    }
+
+    var d = dateEl.value, t = timeEl.value;
+    var day = new Date(d + "T00:00:00");
+    var niceDate = day.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+    var niceTime = timeEl.options[timeEl.selectedIndex].text;
     var data = {
       Name: nameEl.value.trim(),
       Email: emailEl.value.trim(),
       Session: f.elements.type.value,
-      "Preferred date": f.elements.date.value || "Flexible",
-      Details: f.elements.message.value.trim() || "(none)",
-      _subject: "Booking inquiry: " + f.elements.type.value,
+      "Preferred date": niceDate,
+      "Preferred time": niceTime,
+      "Backup times and location": msgEl.value.trim(),
+      _subject: "Booking inquiry: " + f.elements.type.value + ", " + niceDate + " at " + niceTime,
       _replyto: emailEl.value.trim(),
       _template: "table"
     };
-    var d = f.elements.date.value;
-    if (d) {
-      var next = new Date(d + "T00:00:00");
-      next.setDate(next.getDate() + 1);
-      var end = next.getFullYear() + String(next.getMonth() + 1).padStart(2, "0") + String(next.getDate()).padStart(2, "0");
-      data["Add to Google Calendar"] = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-        "&text=" + encodeURIComponent(f.elements.type.value + " with " + nameEl.value.trim()) +
-        "&dates=" + d.replace(/-/g, "") + "/" + end +
-        "&details=" + encodeURIComponent("Email: " + emailEl.value.trim() + "\n" + f.elements.message.value.trim());
-    }   
+
+    // One-click link to add the requested slot to Google Calendar (1 hour block)
+    var startMin = parseInt(t.slice(0, 2), 10) * 60 + parseInt(t.slice(3), 10);
+    var endMin = startMin + 60;
+    var ymd = d.replace(/-/g, "");
+    var stamp = function (mins) { return ymd + "T" + pad(Math.floor(mins / 60)) + pad(mins % 60) + "00"; };
+    data["Add to Google Calendar"] = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+      "&text=" + encodeURIComponent(f.elements.type.value + " with " + nameEl.value.trim()) +
+      "&dates=" + stamp(startMin) + "/" + stamp(endMin) +
+      "&ctz=America/New_York" +
+      "&details=" + encodeURIComponent("Email: " + emailEl.value.trim() + "\nBackup times and location: " + msgEl.value.trim());
+
     btn.disabled = true;
     btn.textContent = "Sending...";
     status.textContent = "";
@@ -235,8 +283,9 @@
       .then(function (r) { return r.json(); })
       .then(function (res) {
         if (String(res.success) !== "true") throw new Error(res.message || "Not sent");
-        status.textContent = "Thanks! Your inquiry was sent. I'll reply by email soon.";
+        status.textContent = "Thanks! Your inquiry was sent. I'll confirm by email soon.";
         f.reset();
+        fillTimes();
       })
       .catch(function () {
         status.innerHTML = "That didn't send. Email me directly at <a href=\"mailto:" + esc(c.email) + "\">" + esc(c.email) + "</a>.";
