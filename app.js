@@ -214,6 +214,16 @@
       _replyto: emailEl.value.trim(),
       _template: "table"
     };
+    var d = f.elements.date.value;
+    if (d) {
+      var next = new Date(d + "T00:00:00");
+      next.setDate(next.getDate() + 1);
+      var end = next.getFullYear() + String(next.getMonth() + 1).padStart(2, "0") + String(next.getDate()).padStart(2, "0");
+      data["Add to Google Calendar"] = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+        "&text=" + encodeURIComponent(f.elements.type.value + " with " + nameEl.value.trim()) +
+        "&dates=" + d.replace(/-/g, "") + "/" + end +
+        "&details=" + encodeURIComponent("Email: " + emailEl.value.trim() + "\n" + f.elements.message.value.trim());
+    }   
     btn.disabled = true;
     btn.textContent = "Sending...";
     status.textContent = "";
